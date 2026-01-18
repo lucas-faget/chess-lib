@@ -106,7 +106,7 @@ export class FischerRandomChess extends Chess {
             sideLoop: for (const side of [CastlingSide.Kingside, CastlingSide.Queenside]) {
                 player.castlingSquares[side].king.from = player.kingSquare.name;
 
-                const direction: Direction = player.castlingDirections[side];
+                const direction: Direction = player.sideDirections[side];
 
                 let square: Square | null = player.kingSquare;
                 while ((square = this.chessboard.getSquareByDirection(square, direction))) {

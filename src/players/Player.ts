@@ -23,7 +23,7 @@ export class Player {
     isChecked: Piece | false = false;
     pawnCaptureDirections: Direction[];
     enPassantCaptureDirections: Direction[];
-    castlingDirections: Record<CastlingSide, Direction>;
+    sideDirections: Record<CastlingSide, Direction>;
     castlingSquares: CastlingSquares;
 
     constructor(
@@ -38,7 +38,7 @@ export class Player {
         this.castlingRights = castlingRights;
         this.pawnCaptureDirections = Pawn.getCaptureDirections(direction);
         this.enPassantCaptureDirections = Pawn.getEnPassantCaptureDirections(direction);
-        this.castlingDirections = {
+        this.sideDirections = {
             kingside: King.getCastlingDirection(CastlingSide.Kingside, direction) ?? Directions.Right,
             queenside: King.getCastlingDirection(CastlingSide.Queenside, direction) ?? Directions.Left,
         };
@@ -59,7 +59,7 @@ export class Player {
 
         if (move.toSquare.isOccupiedByPieceName(PieceName.Rook)) {
             for (const side of [CastlingSide.Kingside, CastlingSide.Queenside]) {
-                if (this.castlingRights[side] && this.castlingDirections[side]) {
+                if (this.castlingRights[side] && this.sideDirections[side]) {
                     if (this.castlingSquares[side].rook.from === move.fromSquare.name) {
                         this.castlingRights[side] = false;
                     }

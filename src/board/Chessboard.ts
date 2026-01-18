@@ -17,7 +17,7 @@ import { Castling } from "../moves/Castling";
 import { PieceDTO } from "../dto/PieceDTO";
 import { MoveDTO } from "../dto/MoveDTO";
 import { SquaresDTO } from "../dto/SquaresDTO";
-import { isInteger, isPieceName } from "../utils";
+import { gcd, isInteger, isPieceName } from "../utils";
 
 export class Chessboard {
     static Ranks: string[] = ["1", "2", "3", "4", "5", "6", "7", "8"];
@@ -122,18 +122,41 @@ export class Chessboard {
         }
     }
 
-    isPathLegal(player: Player, fromSquare: Square, toSquare: Square, direction: Direction): boolean {
+    getDirectionBetween(fromSquare: Square, toSquare: Square): Direction {
+        const dx: number = toSquare.position.x - fromSquare.position.x;
+        const dy: number = toSquare.position.y - fromSquare.position.y;
+
+        if (dx === 0 && dy === 0) {
+            return { dx: 0, dy: 0 };
+        }
+
+        const divisor: number = gcd(Math.abs(dx), Math.abs(dy));
+
+        return {
+            dx: dx / divisor,
+            dy: dy / divisor,
+        };
+    }
+
+    isPathLegal(player: Player, fromSquare: Square, toSquare: Square, ignoredSquareNames: string[] = []): boolean {
+        if (fromSquare === toSquare) {
+            return true;
+        }
+
+        const direction: Direction = this.getDirectionBetween(fromSquare, toSquare);
         let square: Square | null = fromSquare;
 
         while ((square = this.getSquareByDirection(square, direction))) {
-            if (!square.isEmpty()) {
-                return false;
-            }
-
-            if (fromSquare.isOccupiedByPieceName(PieceName.King)) {
-                const move: Move = new Move(fromSquare, square);
-                if (this.isCheckedByMoving(player, move)) {
+            if (!ignoredSquareNames.includes(square.name)) {
+                if (!square.isEmpty()) {
                     return false;
+                }
+
+                if (fromSquare.isOccupiedByPieceName(PieceName.King)) {
+                    const move: Move = new Move(fromSquare, square);
+                    if (this.isCheckedByMoving(player, move)) {
+                        return false;
+                    }
                 }
             }
 

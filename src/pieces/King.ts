@@ -54,12 +54,6 @@ export class King extends Piece {
         if (player.castlingRights.queenside) sides.push(CastlingSide.Queenside);
 
         for (const side of sides) {
-            const direction: Direction = player.castlingDirections[side];
-            const rookDirection: Direction = {
-                dx: -direction.dx,
-                dy: -direction.dy,
-            };
-
             const toSquare: Square | null = chessboard.getSquareByName(player.castlingSquares[side].king.to);
             const rookSquare: Square | null = chessboard.getSquareByName(player.castlingSquares[side].rook.from);
             const rookToSquare: Square | null = chessboard.getSquareByName(player.castlingSquares[side].rook.to);
@@ -68,11 +62,11 @@ export class King extends Piece {
                 continue;
             }
 
-            if (!chessboard.isPathLegal(player, fromSquare, toSquare, direction)) {
+            if (!chessboard.isPathLegal(player, fromSquare, toSquare, [rookSquare.name])) {
                 continue;
             }
 
-            if (!chessboard.isPathLegal(player, rookSquare, rookToSquare, rookDirection)) {
+            if (!chessboard.isPathLegal(player, rookSquare, rookToSquare, [fromSquare.name])) {
                 continue;
             }
 
