@@ -2,6 +2,7 @@ import { Position } from "../coordinates/Position";
 import { Direction } from "../coordinates/Direction";
 import { PieceName } from "../types/PieceName";
 import { PlayerColor } from "../types/PlayerColor";
+import { MoveType } from "../types/MoveType";
 import { LegalMoves } from "../types/LegalMoves";
 import { Piece } from "../pieces/Piece";
 import { Pawn } from "../pieces/Pawn";
@@ -273,10 +274,13 @@ export class Chessboard {
                                 legalMoves[from] = {};
                             }
 
-                            if (!legalMoves[from]?.[to] || move instanceof Castling) {
+                            // Write the move if there is no existing legal move on this square
+                            // Overwrite it only if the existing legal move is a castling
+                            if (!legalMoves[from]?.[to] || legalMoves[from][to].getType() === MoveType.Castling) {
                                 legalMoves[from][to] = move;
                             }
 
+                            // For castling, also add the possibility to click on the rook
                             if (move instanceof Castling) {
                                 legalMoves[from][move.rookMove.fromSquare.name] = move;
                             }
