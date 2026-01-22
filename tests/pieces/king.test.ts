@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { PlayerColor } from "../../src/types/PlayerColor";
+import { MoveType } from "../../src/types/MoveType";
 import { Chess } from "../../src/chess/Chess";
 import { testMove } from "../helpers/moves";
 
@@ -42,7 +43,17 @@ describe("King", () => {
             expect(chess.toFen()).toBe("r3k2r/8/8/8/8/8/8/R3K2R w Kk - 4 3");
         });
 
-        it("cannot castle queenside if a piece is in the way", () => {
+        it("cannot castle kingside if a piece is in the king target square", () => {
+            const chess: Chess = new Chess("4k3/8/8/8/8/8/8/R3K1NR w KQ - 0 1");
+            expect(chess.isLegalMove("e1", "g1")).toBe(false);
+        });
+
+        it("cannot castle kingside if a piece is in the king way", () => {
+            const chess: Chess = new Chess("4k3/8/8/8/8/8/8/R3KB1R w KQ - 0 1");
+            expect(chess.isLegalMove("e1", "g1")).toBe(false);
+        });
+
+        it("cannot castle queenside if a piece is in the rook way", () => {
             const chess: Chess = new Chess("4k3/8/8/8/8/8/8/RN2K2R w KQ - 0 1");
             expect(chess.isLegalMove("e1", "c1")).toBe(false);
         });
@@ -63,6 +74,20 @@ describe("King", () => {
             const chess: Chess = new Chess("4k3/8/8/1q6/8/8/8/R3K2R w KQ - 0 1");
             expect(chess.isLegalMove("e1", "g1")).toBe(false);
             expect(chess.isLegalMove("e1", "c1")).toBe(true);
+        });
+
+        it("should allow kingside castling on rook square", () => {
+            const chess: Chess = new Chess("r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1");
+            expect(chess.isLegalMove("e1", "h1")).toBe(true);
+            expect(chess.getLegalMove("e1", "h1")?.getType()).toBe(MoveType.Castling);
+            expect(chess.getLegalMove("e1", "h1")).toMatchObject(chess.getLegalMove("e1", "g1")!);
+        });
+
+        it("should allow queenside castling on rook square", () => {
+            const chess: Chess = new Chess("r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1");
+            expect(chess.isLegalMove("e1", "a1")).toBe(true);
+            expect(chess.getLegalMove("e1", "a1")?.getType()).toBe(MoveType.Castling);
+            expect(chess.getLegalMove("e1", "a1")).toMatchObject(chess.getLegalMove("e1", "c1")!);
         });
 
         testMove({

@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { PieceName } from "../src/types/PieceName";
 import { CastlingSide } from "../src/types/CastlingSide";
+import { MoveType } from "../src/types/MoveType";
 import { Chess960Rows } from "./data/Chess960Rows";
 import { generateKRConfigs } from "./helpers/fischerRandom";
 import { FischerRandomChess } from "../src/chess/FischerRandomChess";
@@ -43,6 +44,7 @@ describe("Fischer Random Chess", () => {
                             it("should allow castling", () => {
                                 const chess: FischerRandomChess = new FischerRandomChess(fen);
                                 expect(chess.isLegalMove(kingSquare, rookSquare)).toBe(true);
+                                expect(chess.getLegalMove(kingSquare, rookSquare)?.getType()).toBe(MoveType.Castling);
                             });
                         });
                         describe("blacks", () => {
@@ -69,11 +71,30 @@ describe("Fischer Random Chess", () => {
                             it("should allow castling", () => {
                                 const chess: FischerRandomChess = new FischerRandomChess(fen);
                                 expect(chess.isLegalMove(kingSquare, rookSquare)).toBe(true);
+                                expect(chess.getLegalMove(kingSquare, rookSquare)?.getType()).toBe(MoveType.Castling);
                             });
                         });
                     });
                 }
             });
         }
+
+        it("should not allow castling on g1 when a legal move already exists for that square", () => {
+            const fen: string = "r4k1r/pppppppp/8/8/8/8/PPPPPPPP/R4K1R w KQkq - 0 1";
+            const chess: FischerRandomChess = new FischerRandomChess(fen);
+            expect(chess.isLegalMove("f1", "g1")).toBe(true);
+            expect(chess.getLegalMove("f1", "g1")?.getType()).not.toBe(MoveType.Castling);
+            expect(chess.isLegalMove("f1", "h1")).toBe(true);
+            expect(chess.getLegalMove("f1", "h1")?.getType()).toBe(MoveType.Castling);
+        });
+
+        it("should not allow castling on c1 when a legal move already exists for that square", () => {
+            const fen: string = "r2k3r/pppppppp/8/8/8/8/PPPPPPPP/R2K3R w KQkq - 0 1";
+            const chess: FischerRandomChess = new FischerRandomChess(fen);
+            expect(chess.isLegalMove("d1", "c1")).toBe(true);
+            expect(chess.getLegalMove("d1", "c1")?.getType()).not.toBe(MoveType.Castling);
+            expect(chess.isLegalMove("d1", "a1")).toBe(true);
+            expect(chess.getLegalMove("d1", "a1")?.getType()).toBe(MoveType.Castling);
+        });
     });
 });
